@@ -1,0 +1,567 @@
+أتش تي أم أل
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>مقارنة قطار شينكانسن بأربعة ألوان | بطانات ملوّنة شينكانسن</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700;900&amp;family=Noto+Sans+TC:wght@300;400;700;900&amp;display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --white-liner: #1a5fb4;
+    --red-liner: #c01c28;
+    --yellow-liner: #e5a50a;
+    --blue-liner: #26a269;
+    --bg-dark: #0d0d12;
+    --bg-card: #16161e;
+    --text-main: #f0f0f5;
+    --text-sub: #a0a0b0;
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans JP', 'Noto Sans TC', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background particles */
+  .bg-particles {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .bg-particles span {
+    position: absolute; width: 2px; height: 2px;
+    background: rgba(255,255,255,0.15); border-radius: 50%;
+    animation: float 20s infinite linear;
+  }
+  @keyframes float {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-10vh) translateX(50px); opacity: 0; }
+  }
+
+  /* Track lines background */
+  .track-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; opacity: 0.03;
+    background-image: 
+      repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(255,255,255,0.3) 49px, rgba(255,255,255,0.3) 51px),
+      repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(255,255,255,0.3) 49px, rgba(255,255,255,0.3) 51px);
+  }
+
+  .container { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+
+  /* Lang switcher + kofi bar */
+  .topbar {
+    position: relative; z-index: 2; max-width: 1400px; margin: 0 auto;
+    padding: 18px 24px 0; display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+  }
+  .topbar a.back { color: var(--text-sub); text-decoration: none; font-size: 0.85rem; }
+  .topbar a.back:hover { color: var(--text-main); }
+  .topbar-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .topbar select {
+    background: var(--bg-card); color: var(--text-main);
+    border: 1px solid var(--glass-border); border-radius: 8px;
+    padding: 8px 12px; font-size: 0.8rem; font-family: inherit;
+  }
+  .kofi-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 20px; background: #ff5e5b; color: #fff;
+    text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 0.85rem;
+  }
+  .kofi-btn svg { width: 16px; height: 16px; }
+
+  /* Header */
+  header {
+    text-align: center; padding: 60px 20px 50px;
+    position: relative;
+  }
+  header::before {
+    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 600px; height: 300px; background: radial-gradient(ellipse, rgba(26,95,180,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-badge {
+    display: inline-block; padding: 6px 20px; border-radius: 100px;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    font-size: 0.75rem; letter-spacing: 0.15em; color: var(--text-sub);
+    text-transform: uppercase; margin-bottom: 24px;
+  }
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 900;
+    letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff 0%, #8a8aa8 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+    font-size: 1.1rem; color: var(--text-sub); font-weight: 300;
+    letter-spacing: 0.05em; max-width: 600px; margin: 0 auto;
+  }
+  .color-dots {
+    display: flex; justify-content: center; gap: 12px; margin-top: 32px;
+  }
+  .color-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    box-shadow: 0 0 12px currentColor; transition: transform 0.3s;
+  }
+  .color-dot:hover { transform: scale(1.4); }
+  .dot-white { background: var(--white-liner); color: var(--white-liner); }
+  .dot-red { background: var(--red-liner); color: var(--red-liner); }
+  .dot-yellow { background: var(--yellow-liner); color: var(--yellow-liner); }
+  .dot-blue { background: var(--blue-liner); color: var(--blue-liner); }
+
+  /* Cards Grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px; padding: 40px 0 60px;
+  }
+
+  .train-card {
+    background: var(--bg-card);
+    border-radius: 24px; overflow: hidden;
+    border: 1px solid var(--glass-border);
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative; opacity: 0; transform: translateY(40px);
+  }
+  .train-card.visible { opacity: 1; transform: translateY(0); }
+  .train-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    transition: height 0.4s;
+  }
+  .train-card:hover::before { height: 100%; opacity: 0.06; }
+  .train-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(255,255,255,0.15);
+    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.5);
+  }
+
+  .card-white::before { background: var(--white-liner); }
+  .card-red::before { background: var(--red-liner); }
+  .card-yellow::before { background: var(--yellow-liner); }
+  .card-blue::before { background: var(--blue-liner); }
+
+  .card-image-wrap {
+    position: relative; height: 220px; overflow: hidden;
+  }
+  .card-image-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .train-card:hover .card-image-wrap img { transform: scale(1.08); }
+  .card-image-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 60%; background: linear-gradient(to top, var(--bg-card), transparent);
+  }
+  .liner-badge {
+    position: absolute; top: 16px; left: 16px;
+    padding: 6px 14px; border-radius: 100px; font-size: 0.7rem;
+    font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15);
+  }
+  .badge-white { background: rgba(26,95,180,0.25); color: #7eb8ff; }
+  .badge-red { background: rgba(192,28,40,0.25); color: #ff7a85; }
+  .badge-yellow { background: rgba(229,165,10,0.25); color: #ffd166; }
+  .badge-blue { background: rgba(38,162,105,0.25); color: #8ff0a4; }
+
+  .card-body { padding: 24px; position: relative; z-index: 2; }
+  .card-title {
+    font-size: 1.6rem; font-weight: 900; margin-bottom: 4px;
+    letter-spacing: -0.02em;
+  }
+  .card-subtitle {
+    font-size: 0.9rem; color: var(--text-sub); margin-bottom: 20px;
+    font-weight: 400;
+  }
+  .card-desc {
+    font-size: 0.85rem; line-height: 1.7; color: var(--text-sub);
+    margin-bottom: 20px; min-height: 70px;
+  }
+
+  .spec-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid var(--glass-border);
+    font-size: 0.82rem;
+  }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-label { color: var(--text-sub); font-weight: 400; }
+  .spec-value { font-weight: 700; color: var(--text-main); }
+  .speed-highlight {
+    font-size: 1.4rem; font-weight: 900;
+    background: linear-gradient(135deg, #fff, #888);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  /* Comparison Table Section */
+  .compare-section { padding: 60px 0 100px; }
+  .section-header {
+    text-align: center; margin-bottom: 48px;
+  }
+  .section-header h2 {
+    font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 900;
+    margin-bottom: 12px; letter-spacing: -0.02em;
+  }
+  .section-header p { color: var(--text-sub); font-size: 0.95rem; }
+
+  .compare-table-wrap {
+    background: var(--bg-card); border-radius: 24px;
+    border: 1px solid var(--glass-border); overflow: hidden;
+    overflow-x: auto;
+  }
+  table {
+    width: 100%; border-collapse: collapse; min-width: 700px;
+  }
+  th, td { padding: 18px 24px; text-align: left; font-size: 0.9rem; }
+  th {
+    background: rgba(255,255,255,0.03); font-weight: 700;
+    color: var(--text-sub); text-transform: uppercase;
+    letter-spacing: 0.08em; font-size: 0.75rem;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  td { border-bottom: 1px solid var(--glass-border); color: var(--text-main); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .col-name { font-weight: 700; display: flex; align-items: center; gap: 10px; }
+  .col-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .col-white { background: var(--white-liner); box-shadow: 0 0 8px var(--white-liner); }
+  .col-red { background: var(--red-liner); box-shadow: 0 0 8px var(--red-liner); }
+  .col-yellow { background: var(--yellow-liner); box-shadow: 0 0 8px var(--yellow-liner); }
+  .col-blue { background: var(--blue-liner); box-shadow: 0 0 8px var(--blue-liner); }
+
+  .speed-cell { font-weight: 900; font-size: 1.1rem; }
+  .speed-320 { color: #ff7a85; }
+  .speed-300 { color: #7eb8ff; }
+  .speed-other { color: #ffd166; }
+
+  /* Footer */
+  footer {
+    text-align: center; padding: 40px 20px; color: var(--text-sub);
+    font-size: 0.8rem; border-top: 1px solid var(--glass-border);
+  }
+  footer a { color: var(--text-sub); text-decoration: none; }
+  footer a:hover { color: var(--text-main); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-dark); }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    header { padding: 40px 16px 30px; }
+    .cards-grid { grid-template-columns: 1fr; gap: 20px; padding: 20px 0 40px; }
+    .card-image-wrap { height: 200px; }
+    th, td { padding: 14px 16px; font-size: 0.82rem; }
+  }
+
+  /* Speedometer animation */
+  .speed-gauge {
+    display: inline-flex; align-items: baseline; gap: 4px;
+  }
+  .speed-number {
+    font-variant-numeric: tabular-nums;
+    display: inline-block;
+  }
+</style>
+</head>
+<body>
+<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:18px"><select onchange="location.href=this.value" style="background:var(--card,#171e2e);color:var(--text,#e8e8e8);border:1px solid var(--border,rgba(255,255,255,.08));border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit"><option value="https://forumdata-collab.github.io/shinkansen-liners/en/">English (US)</option><option value="https://forumdata-collab.github.io/shinkansen-liners/zh-CN/">简体中文</option><option value="https://forumdata-collab.github.io/shinkansen-liners/zh-TW/">繁體中文（台灣）</option><option value="https://forumdata-collab.github.io/shinkansen-liners/">繁體中文（香港）</option><option value="https://forumdata-collab.github.io/shinkansen-liners/ar/" selected>العربية</option></select><a href="https://ko-fi.com/forumdata" target="_blank" style="display:inline-flex;align-items:center;gap:10px;padding:12px 28px;background:#ff5e5b;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:15px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.47.06 8.529-1.723 8.649-4.916zm-11.638 8.978c-2.252 0-4.078-1.826-4.078-4.078s1.826-4.078 4.078-4.078 4.078 1.826 4.078 4.078-4.078 4.078z"/></svg>☕ 請我喝杯咖啡</a></div>
+<div class="track-bg"></div>
+<div class="bg-particles" id="particles"></div>
+<div class="topbar">
+<a class="back" href="https://forumdata-collab.github.io/">← العودة إلى الصفحة الرئيسية</a>
+<div class="topbar-right">
+<select aria-label="Language" id="lang-switch" onchange="location.href=this.value">
+<option selected="" value="https://forumdata-collab.github.io/shinkansen-liners/">繁體中文（香港）</option>
+<option value="https://forumdata-collab.github.io/shinkansen-liners/en/">English (US)</option>
+<option value="https://forumdata-collab.github.io/shinkansen-liners/zh-CN/">简体中文</option>
+<option value="https://forumdata-collab.github.io/shinkansen-liners/zh-TW/">繁體中文（台灣）</option>
+<option value="https://forumdata-collab.github.io/shinkansen-liners/ar/">العربية</option>
+</select>
+<a class="kofi-btn" href="https://ko-fi.com/forumdata" target="_blank">
+<svg fill="white" viewbox="0 0 24 24"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.47.06 8.529-1.723 8.649-4.916zm-11.638 8.978c-2.252 0-4.078-1.826-4.078-4.078s1.826-4.078 4.078-4.078 4.078 1.826 4.078 4.078-4.078 4.078z"></path></svg>☕ إشتري لي فنجاناً من القهوة</a>
+</div>
+</div>
+<div class="container">
+<header>
+<div class="header-badge">مقارنة شينكانسن</div>
+<h1>قطار شينكانسن ذو الأربعة ألوان</h1>
+<p class="subtitle">أبيض · أحمر · أصفر · أزرق — أربعة قطارات ترمز إلى روح السكك الحديدية عالية السرعة في اليابان. من المشغلين الرئيسيين إلى رواد التفتيش، يحمل كل منهم مهام وأساطير مختلفة.</p>
+<div class="color-dots">
+<div class="color-dot dot-white" title="N700系 のぞみ"></div>
+<div class="color-dot dot-red" title="E6系 こまち"></div>
+<div class="color-dot dot-yellow" title="Doctor Yellow 923形"></div>
+<div class="color-dot dot-blue" title="E5系 はやぶさ"></div>
+</div>
+</header>
+<section class="cards-grid">
+بطانة بيضاء
+<article class="train-card card-white" data-delay="0">
+<div class="card-image-wrap">
+<img alt="N700系 のぞみ" src="https://img.hermesagent.de5.net/shinkansen/n700.jpg"/>
+<div class="card-image-overlay"></div>
+<span class="liner-badge badge-white">بطانة بيضاء</span>
+</div>
+<div class="card-body">
+<h3 class="card-title">سلسلة N700</h3>
+<p class="card-subtitle">のぞみ · توكايدو · سانيو شينكانسن</p>
+<p class="card-desc">السيارة الرئيسية من الجيل الخامس في توكايدو شينكانسن، "ダブルウイング・エアロ"، لها شكل أمامي مميز للغاية. مجهزة بجهاز إمالة جسم السيارة، يمكنها السفر بين توكايدو وسانيو مع أداء تسارع على مستوى قطار الركاب.</p>
+<div class="spec-row">
+<span class="spec-label">السرعة القصوى</span>
+<span class="spec-value speed-highlight"><span class="speed-number">300</span><span style="font-size:0.7em;font-weight:400;color:var(--text-sub)">كم/ساعة</span></span>
+</div>
+<div class="spec-row">
+<span class="spec-label">ترجمة</span>
+<span class="spec-value">16 両 / 1323 شخصًا</span>
+</div>
+<div class="spec-row">
+<span class="spec-label">يبدأ العمل</span>
+<span class="spec-value">يوليو 2007</span>
+</div>
+<div class="spec-row">
+<span class="spec-label">نطاق التشغيل</span>
+<span class="spec-value">طوكيو ~ هاكاتا</span>
+</div>
+</div>
+</article>
+بطانة حمراء
+<article class="train-card card-red" data-delay="100">
+<div class="card-image-wrap">
+<img alt="E6系 こまち" src="https://img.hermesagent.de5.net/shinkansen/e6.jpg"/>
+<div class="card-image-overlay"></div>
+<span class="liner-badge badge-red">بطانة حمراء</span>
+</div>
+<div class="card-body">
+<h3 class="card-title">سلسلة E6</h3>
+<p class="card-subtitle">こまち · أكيتا شينكانسن</p>
+<p class="card-desc">تم طلاء سيارة أكيتا شينكانسن من الجيل الثاني باللون الأحمر الأكاني المستوحى من أضواء "النانو" و"كانتو" التقليدية في أكيتا. وتتكون من 7 سيارات صغيرة ولكن تبلغ سرعتها القصوى 320 كم/ساعة، وهو نفس مستوى سلسلة E5. إنه نموذج جديد للقيادة المباشرة.</p>
+<div class="spec-row">
+<span class="spec-label">السرعة القصوى</span>
+<span class="spec-value speed-highlight"><span class="speed-number">320</span><span style="font-size:0.7em;font-weight:400;color:var(--text-sub)">كم/ساعة</span></span>
+</div>
+<div class="spec-row">
+<span class="spec-label">ترجمة</span>
+<span class="spec-value">7両</span>
+</div>
+<div class="spec-row">
+<span class="spec-label">يبدأ العمل</span>
+<span class="spec-value">مارس 2013</span>
+</div>
+<div class="spec-row">
+<span class="spec-label">نطاق التشغيل</span>
+<span class="spec-value">طوكيو ~ أكيتا</span>
+</div>
+</div>
+</article>
+بطانة صفراء
+<article class="train-card card-yellow" data-delay="200">
+<div class="card-image-wrap">
+<img alt="Doctor Yellow 923形" src="https://img.hermesagent.de5.net/shinkansen/yellow.jpg"/>
+<div class="card-image-overlay"></div>
+<span class="liner-badge badge-yellow">بطانة صفراء</span>
+</div>
+<div class="card-body">
+<h3 class="card-title">923 الشكل</h3>
+<p class="card-subtitle">دكتور يلو · فحص شامل للمركبة</p>
+<p class="card-desc">يشتهر "طبيب" الشينكانسن بجسمه الأصفر الزاهي وخطوطه الزرقاء. وهي لا تنقل الركاب، ولكنها مسؤولة عن اختبار المسارات والمعدات الكهربائية وأنظمة الإشارات. يعتبره عشاق السكك الحديدية وجودًا غامضًا "سيجعلك محظوظًا عندما تراه".</p>
+<div class="spec-row">
+<span class="spec-label">طبيعة</span>
+<span class="spec-value">مركبة غير تجارية/فحص</span>
+</div>
+<div class="spec-row">
+<span class="spec-label">عناصر الاختبار</span>
+<span class="spec-value">المسار · الكهربائية · الإشارة</span>
+</div>
+<div class="spec-row">
+<span class="spec-label">تلوين</span>
+<span class="spec-value">خطوط صفراء + زرقاء</span>
+</div>
+<div class="spec-row">
+<span class="spec-label">كنية</span>
+<span class="spec-value">ド ク タ イ エ ロ ー</span>
+</div>
+</div>
+</article>
+بلو لاينر
+<article class="train-card card-blue" data-delay="300">
+<div class="card-image-wrap">
+<img alt="E5系 はやぶさ" src="https://img.hermesagent.de5.net/shinkansen/e5.jpg"/>
+<div class="card-image-overlay"></div>
+<span class="liner-badge badge-blue">بلو لاينر</span>
+</div>
+<div class="card-body">
+<h3 class="card-title">سلسلة E5</h3>
+<p class="card-subtitle">はやぶさ · توهوكو · هوكايدو شينكانسن</p>
+<p class="card-desc">صاحب أعلى سرعة تشغيل في اليابان تبلغ 320 كم/ساعة، وهو مزيج أنيق من Tokiwa Green وFeiyun White. تعمل المقدمة التي يبلغ طولها 15 مترًا على تقليل موجات الضغط الجزئي في النفق بشكل كبير، وهي الأولى من نوعها التي أنشأت مقاعد رفيعة المستوى من طراز "Gran Class"، مما يبشر بعصر جديد من قطار الشينكانسن.</p>
+<div class="spec-row">
+<span class="spec-label">السرعة القصوى</span>
+<span class="spec-value speed-highlight"><span class="speed-number">320</span><span style="font-size:0.7em;font-weight:400;color:var(--text-sub)">كم/ساعة</span></span>
+</div>
+<div class="spec-row">
+<span class="spec-label">ترجمة</span>
+<span class="spec-value">10 両 / 731 شخصًا</span>
+</div>
+<div class="spec-row">
+<span class="spec-label">يبدأ العمل</span>
+<span class="spec-value">مارس 2011</span>
+</div>
+<div class="spec-row">
+<span class="spec-label">نطاق التشغيل</span>
+<span class="spec-value">طوكيو ~ شين هاكوداته هوكوتو</span>
+</div>
+</div>
+</article>
+</section>
+<section class="compare-section">
+<div class="section-header">
+<h2>جدول مقارنة المواصفات</h2>
+<p>البيانات الأساسية للقطارات الأربعة واضحة في لمحة</p>
+</div>
+<div class="compare-table-wrap">
+<table>
+<thead>
+<tr>
+<th>مشروع</th>
+<th><span class="col-name"><span class="col-dot col-white"></span>سلسلة N700</span></th>
+<th><span class="col-name"><span class="col-dot col-red"></span>سلسلة E6</span></th>
+<th><span class="col-name"><span class="col-dot col-yellow"></span>923 شكل دكتور أصفر</span></th>
+<th><span class="col-name"><span class="col-dot col-blue"></span>سلسلة E5</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="spec-label">فئة</td>
+<td>تشغيل القطارات</td>
+<td>تشغيل القطارات</td>
+<td>كشف القطار</td>
+<td>تشغيل القطارات</td>
+</tr>
+<tr>
+<td class="spec-label">اللون التمثيلي</td>
+<td>خطوط بيضاء + زرقاء</td>
+<td>الفوة + حزام فضي</td>
+<td>خطوط صفراء + زرقاء</td>
+<td>حزام توكيوا أخضر + وردي</td>
+</tr>
+<tr>
+<td class="spec-label">السرعة القصوى</td>
+<td class="speed-cell speed-300">285 ~ 300 كم / ساعة</td>
+<td class="speed-cell speed-320">320 كم/ساعة</td>
+<td class="speed-cell speed-other">—</td>
+<td class="speed-cell speed-320">320 كم/ساعة</td>
+</tr>
+<tr>
+<td class="spec-label">ترجمة</td>
+<td>16 両</td>
+<td>7両</td>
+<td>7両</td>
+<td>10 両</td>
+</tr>
+<tr>
+<td class="spec-label">سعة</td>
+<td>1,323 شخص</td>
+<td>حوالي 400 شخص</td>
+<td>—</td>
+<td>731 شخصا</td>
+</tr>
+<tr>
+<td class="spec-label">الشكل الرائد</td>
+<td>ダブルウイング・エアロ</td>
+<td>ロングノズ</td>
+<td>تبسيط</td>
+<td>ロングノズ(15م)</td>
+</tr>
+<tr>
+<td class="spec-label">جهاز خاص</td>
+<td>جهاز إمالة جسم السيارة</td>
+<td>إمالة جسم السيارة · التعليق النشط</td>
+<td>المسار · معدات الاختبار الكهربائية</td>
+<td>إمالة جسم السيارة · التعليق النشط</td>
+</tr>
+<tr>
+<td class="spec-label">يبدأ العمل</td>
+<td>2007</td>
+<td>2013</td>
+<td>2002</td>
+<td>2011</td>
+</tr>
+<tr>
+<td class="spec-label">ينتمي ل</td>
+<td>جي آر توكاي / جي آر ويست</td>
+<td>جي آر إيست</td>
+<td>جي آر توكاي / جي آر ويست</td>
+<td>جي آر إيست / جي آر هوكايدو</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<footer>
+<p>مقارنة قطارات شينكانسن ذات الأربعة ألوان · الاستخدام الخاص · مصدر الصورة: photoAC (مادة مجانية)</p>
+<p style="margin-top:8px;opacity:0.6;">سلسلة N700 · سلسلة E6 · 923 شكل دكتور يلو · سلسلة E5</p>
+</footer>
+</div>
+<script>
+  // Generate background particles
+  const particlesContainer = document.getElementById('particles');
+  for (let i = 0; i < 40; i++) {
+    const span = document.createElement('span');
+    span.style.left = Math.random() * 100 + '%';
+    span.style.animationDuration = (15 + Math.random() * 20) + 's';
+    span.style.animationDelay = (Math.random() * 20) + 's';
+    span.style.opacity = Math.random() * 0.5 + 0.2;
+    particlesContainer.appendChild(span);
+  }
+
+  // Intersection Observer for card reveal
+  const observerOptions = { threshold: 0.15, rootMargin: '0px 0px -50px 0px' };
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const delay = parseInt(entry.target.dataset.delay) || 0;
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, delay);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.train-card').forEach(card => {
+    observer.observe(card);
+  });
+
+  // Speed number counter animation
+  const speedNumbers = document.querySelectorAll('.speed-number');
+  const speedObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const target = entry.target;
+        const finalValue = parseInt(target.textContent);
+        let current = 0;
+        const duration = 1500;
+        const increment = finalValue / (duration / 16);
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= finalValue) {
+            current = finalValue;
+            clearInterval(timer);
+          }
+          target.textContent = Math.floor(current);
+        }, 16);
+        speedObserver.unobserve(target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  speedNumbers.forEach(el => speedObserver.observe(el));
+</script>
+</body>
+</html>
