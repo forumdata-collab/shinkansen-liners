@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新幹線四色列車對比 | Shinkansen Color Liners</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700;900&family=Noto+Sans+TC:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white-liner: #1a5fb4;
+    --red-liner: #c01c28;
+    --yellow-liner: #e5a50a;
+    --blue-liner: #26a269;
+    --bg-dark: #0d0d12;
+    --bg-card: #16161e;
+    --text-main: #f0f0f5;
+    --text-sub: #a0a0b0;
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans JP', 'Noto Sans TC', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background particles */
+  .bg-particles {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .bg-particles span {
+    position: absolute; width: 2px; height: 2px;
+    background: rgba(255,255,255,0.15); border-radius: 50%;
+    animation: float 20s infinite linear;
+  }
+  @keyframes float {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-10vh) translateX(50px); opacity: 0; }
+  }
+
+  /* Track lines background */
+  .track-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; opacity: 0.03;
+    background-image: 
+      repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(255,255,255,0.3) 49px, rgba(255,255,255,0.3) 51px),
+      repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(255,255,255,0.3) 49px, rgba(255,255,255,0.3) 51px);
+  }
+
+  .container { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+
+  /* Lang switcher + kofi bar */
+  .topbar {
+    position: relative; z-index: 2; max-width: 1400px; margin: 0 auto;
+    padding: 18px 24px 0; display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+  }
+  .topbar a.back { color: var(--text-sub); text-decoration: none; font-size: 0.85rem; }
+  .topbar a.back:hover { color: var(--text-main); }
+  .topbar-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .topbar select {
+    background: var(--bg-card); color: var(--text-main);
+    border: 1px solid var(--glass-border); border-radius: 8px;
+    padding: 8px 12px; font-size: 0.8rem; font-family: inherit;
+  }
+  .kofi-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 20px; background: #ff5e5b; color: #fff;
+    text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 0.85rem;
+  }
+  .kofi-btn svg { width: 16px; height: 16px; }
+
+  /* Header */
+  header {
+    text-align: center; padding: 60px 20px 50px;
+    position: relative;
+  }
+  header::before {
+    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 600px; height: 300px; background: radial-gradient(ellipse, rgba(26,95,180,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-badge {
+    display: inline-block; padding: 6px 20px; border-radius: 100px;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    font-size: 0.75rem; letter-spacing: 0.15em; color: var(--text-sub);
+    text-transform: uppercase; margin-bottom: 24px;
+  }
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 900;
+    letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff 0%, #8a8aa8 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+    font-size: 1.1rem; color: var(--text-sub); font-weight: 300;
+    letter-spacing: 0.05em; max-width: 600px; margin: 0 auto;
+  }
+  .color-dots {
+    display: flex; justify-content: center; gap: 12px; margin-top: 32px;
+  }
+  .color-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    box-shadow: 0 0 12px currentColor; transition: transform 0.3s;
+  }
+  .color-dot:hover { transform: scale(1.4); }
+  .dot-white { background: var(--white-liner); color: var(--white-liner); }
+  .dot-red { background: var(--red-liner); color: var(--red-liner); }
+  .dot-yellow { background: var(--yellow-liner); color: var(--yellow-liner); }
+  .dot-blue { background: var(--blue-liner); color: var(--blue-liner); }
+
+  /* Cards Grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px; padding: 40px 0 60px;
+  }
+
+  .train-card {
+    background: var(--bg-card);
+    border-radius: 24px; overflow: hidden;
+    border: 1px solid var(--glass-border);
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative; opacity: 0; transform: translateY(40px);
+  }
+  .train-card.visible { opacity: 1; transform: translateY(0); }
+  .train-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    transition: height 0.4s;
+  }
+  .train-card:hover::before { height: 100%; opacity: 0.06; }
+  .train-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(255,255,255,0.15);
+    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.5);
+  }
+
+  .card-white::before { background: var(--white-liner); }
+  .card-red::before { background: var(--red-liner); }
+  .card-yellow::before { background: var(--yellow-liner); }
+  .card-blue::before { background: var(--blue-liner); }
+
+  .card-image-wrap {
+    position: relative; height: 220px; overflow: hidden;
+  }
+  .card-image-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .train-card:hover .card-image-wrap img { transform: scale(1.08); }
+  .card-image-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 60%; background: linear-gradient(to top, var(--bg-card), transparent);
+  }
+  .liner-badge {
+    position: absolute; top: 16px; left: 16px;
+    padding: 6px 14px; border-radius: 100px; font-size: 0.7rem;
+    font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15);
+  }
+  .badge-white { background: rgba(26,95,180,0.25); color: #7eb8ff; }
+  .badge-red { background: rgba(192,28,40,0.25); color: #ff7a85; }
+  .badge-yellow { background: rgba(229,165,10,0.25); color: #ffd166; }
+  .badge-blue { background: rgba(38,162,105,0.25); color: #8ff0a4; }
+
+  .card-body { padding: 24px; position: relative; z-index: 2; }
+  .card-title {
+    font-size: 1.6rem; font-weight: 900; margin-bottom: 4px;
+    letter-spacing: -0.02em;
+  }
+  .card-subtitle {
+    font-size: 0.9rem; color: var(--text-sub); margin-bottom: 20px;
+    font-weight: 400;
+  }
+  .card-desc {
+    font-size: 0.85rem; line-height: 1.7; color: var(--text-sub);
+    margin-bottom: 20px; min-height: 70px;
+  }
+
+  .spec-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid var(--glass-border);
+    font-size: 0.82rem;
+  }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-label { color: var(--text-sub); font-weight: 400; }
+  .spec-value { font-weight: 700; color: var(--text-main); }
+  .speed-highlight {
+    font-size: 1.4rem; font-weight: 900;
+    background: linear-gradient(135deg, #fff, #888);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  /* Comparison Table Section */
+  .compare-section { padding: 60px 0 100px; }
+  .section-header {
+    text-align: center; margin-bottom: 48px;
+  }
+  .section-header h2 {
+    font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 900;
+    margin-bottom: 12px; letter-spacing: -0.02em;
+  }
+  .section-header p { color: var(--text-sub); font-size: 0.95rem; }
+
+  .compare-table-wrap {
+    background: var(--bg-card); border-radius: 24px;
+    border: 1px solid var(--glass-border); overflow: hidden;
+    overflow-x: auto;
+  }
+  table {
+    width: 100%; border-collapse: collapse; min-width: 700px;
+  }
+  th, td { padding: 18px 24px; text-align: left; font-size: 0.9rem; }
+  th {
+    background: rgba(255,255,255,0.03); font-weight: 700;
+    color: var(--text-sub); text-transform: uppercase;
+    letter-spacing: 0.08em; font-size: 0.75rem;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  td { border-bottom: 1px solid var(--glass-border); color: var(--text-main); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .col-name { font-weight: 700; display: flex; align-items: center; gap: 10px; }
+  .col-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .col-white { background: var(--white-liner); box-shadow: 0 0 8px var(--white-liner); }
+  .col-red { background: var(--red-liner); box-shadow: 0 0 8px var(--red-liner); }
+  .col-yellow { background: var(--yellow-liner); box-shadow: 0 0 8px var(--yellow-liner); }
+  .col-blue { background: var(--blue-liner); box-shadow: 0 0 8px var(--blue-liner); }
+
+  .speed-cell { font-weight: 900; font-size: 1.1rem; }
+  .speed-320 { color: #ff7a85; }
+  .speed-300 { color: #7eb8ff; }
+  .speed-other { color: #ffd166; }
+
+  /* Footer */
+  footer {
+    text-align: center; padding: 40px 20px; color: var(--text-sub);
+    font-size: 0.8rem; border-top: 1px solid var(--glass-border);
+  }
+  footer a { color: var(--text-sub); text-decoration: none; }
+  footer a:hover { color: var(--text-main); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-dark); }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    header { padding: 40px 16px 30px; }
+    .cards-grid { grid-template-columns: 1fr; gap: 20px; padding: 20px 0 40px; }
+    .card-image-wrap { height: 200px; }
+    th, td { padding: 14px 16px; font-size: 0.82rem; }
+  }
+
+  /* Speedometer animation */
+  .speed-gauge {
+    display: inline-flex; align-items: baseline; gap: 4px;
+  }
+  .speed-number {
+    font-variant-numeric: tabular-nums;
+    display: inline-block;
+  }
+</style>
+</head>
+<body>
+
+<div class="track-bg"></div>
+<div class="bg-particles" id="particles"></div>
+
+<div class="topbar">
+  <a class="back" href="https://forumdata-collab.github.io/">← 返回主頁</a>
+  <div class="topbar-right">
+    <select id="lang-switch" onchange="location.href=this.value" aria-label="Language">
+      <option value="https://forumdata-collab.github.io/shinkansen-liners/" selected>繁體中文（香港）</option>
+      <option value="https://forumdata-collab.github.io/shinkansen-liners/en/">English (US)</option>
+      <option value="https://forumdata-collab.github.io/shinkansen-liners/zh-CN/">简体中文</option>
+      <option value="https://forumdata-collab.github.io/shinkansen-liners/zh-TW/">繁體中文（台灣）</option>
+      <option value="https://forumdata-collab.github.io/shinkansen-liners/ar/">العربية</option>
+    </select>
+    <a class="kofi-btn" href="https://ko-fi.com/forumdata" target="_blank">
+      <svg viewBox="0 0 24 24" fill="white"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.47.06 8.529-1.723 8.649-4.916zm-11.638 8.978c-2.252 0-4.078-1.826-4.078-4.078s1.826-4.078 4.078-4.078 4.078 1.826 4.078 4.078-4.078 4.078z"/></svg>
+      ☕ 請我喝杯咖啡
+    </a>
+  </div>
+</div>
+
+<div class="container">
+  <header>
+    <div class="header-badge">Shinkansen Comparison</div>
+    <h1>新幹線四色列車</h1>
+    <p class="subtitle">
+      White · Red · Yellow · Blue — 四款象徵日本高速鐵路靈魂的列車，從營運主力到檢測先鋒，各自承載不同的使命與傳奇。
+    </p>
+    <div class="color-dots">
+      <div class="color-dot dot-white" title="N700系 のぞみ"></div>
+      <div class="color-dot dot-red" title="E6系 こまち"></div>
+      <div class="color-dot dot-yellow" title="Doctor Yellow 923形"></div>
+      <div class="color-dot dot-blue" title="E5系 はやぶさ"></div>
+    </div>
+  </header>
+
+  <section class="cards-grid">
+    <!-- White Liner -->
+    <article class="train-card card-white" data-delay="0">
+      <div class="card-image-wrap">
+        <img src="https://img.hermesagent.de5.net/shinkansen/n700.jpg" alt="N700系 のぞみ">
+        <div class="card-image-overlay"></div>
+        <span class="liner-badge badge-white">White Liner</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">N700系</h3>
+        <p class="card-subtitle">のぞみ · 東海道·山陽新幹線</p>
+        <p class="card-desc">
+          東海道新幹線第五代主力車輛，「ダブルウイング・エアロ」先頭造型極具辨識度。搭載車體傾斜裝置，以通勤電車級的加速性能馳騁東海道與山陽之間。
+        </p>
+        <div class="spec-row">
+          <span class="spec-label">最高速度</span>
+          <span class="spec-value speed-highlight"><span class="speed-number">300</span><span style="font-size:0.7em;font-weight:400;color:var(--text-sub)"> km/h</span></span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">編成</span>
+          <span class="spec-value">16両 / 1,323人</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">營業開始</span>
+          <span class="spec-value">2007年7月</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">營運區間</span>
+          <span class="spec-value">東京〜博多</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- Red Liner -->
+    <article class="train-card card-red" data-delay="100">
+      <div class="card-image-wrap">
+        <img src="https://img.hermesagent.de5.net/shinkansen/e6.jpg" alt="E6系 こまち">
+        <div class="card-image-overlay"></div>
+        <span class="liner-badge badge-red">Red Liner</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">E6系</h3>
+        <p class="card-subtitle">こまち · 秋田新幹線</p>
+        <p class="card-desc">
+          以秋田傳統「なまはげ」與「竿燈」為靈感的茜紅色塗裝，秋田新幹線第二代車輛。7輛迷你編成卻擁有與E5系同級的320km/h極速，新在直通的典範。
+        </p>
+        <div class="spec-row">
+          <span class="spec-label">最高速度</span>
+          <span class="spec-value speed-highlight"><span class="speed-number">320</span><span style="font-size:0.7em;font-weight:400;color:var(--text-sub)"> km/h</span></span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">編成</span>
+          <span class="spec-value">7両</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">營業開始</span>
+          <span class="spec-value">2013年3月</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">營運區間</span>
+          <span class="spec-value">東京〜秋田</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- Yellow Liner -->
+    <article class="train-card card-yellow" data-delay="200">
+      <div class="card-image-wrap">
+        <img src="https://img.hermesagent.de5.net/shinkansen/yellow.jpg" alt="Doctor Yellow 923形">
+        <div class="card-image-overlay"></div>
+        <span class="liner-badge badge-yellow">Yellow Liner</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">923形</h3>
+        <p class="card-subtitle">Doctor Yellow · 綜合檢測車</p>
+        <p class="card-desc">
+          新幹線的「醫生」，以鮮黃色車身與藍色條紋聞名。不載客，專責檢測軌道、電氣設備與信號系統，被鐵道迷視為「看到就會幸運」的神秘存在。
+        </p>
+        <div class="spec-row">
+          <span class="spec-label">性質</span>
+          <span class="spec-value">非營業·檢測車</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">檢測項目</span>
+          <span class="spec-value">軌道·電氣·信號</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">塗裝</span>
+          <span class="spec-value">黃色 + 藍色條紋</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">別稱</span>
+          <span class="spec-value">ドクターイエロー</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- Blue Liner -->
+    <article class="train-card card-blue" data-delay="300">
+      <div class="card-image-wrap">
+        <img src="https://img.hermesagent.de5.net/shinkansen/e5.jpg" alt="E5系 はやぶさ">
+        <div class="card-image-overlay"></div>
+        <span class="liner-badge badge-blue">Blue Liner</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">E5系</h3>
+        <p class="card-subtitle">はやぶさ · 東北·北海道新幹線</p>
+        <p class="card-desc">
+          日本國內營業最高速320km/h的保持者，常盤綠與飛雲白的優雅組合。15米長鼻頭大幅降低隧道微氣壓波，更首創「Gran Class」頂級座席，引領新幹線新時代。
+        </p>
+        <div class="spec-row">
+          <span class="spec-label">最高速度</span>
+          <span class="spec-value speed-highlight"><span class="speed-number">320</span><span style="font-size:0.7em;font-weight:400;color:var(--text-sub)"> km/h</span></span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">編成</span>
+          <span class="spec-value">10両 / 731人</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">營業開始</span>
+          <span class="spec-value">2011年3月</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">營運區間</span>
+          <span class="spec-value">東京〜新函館北斗</span>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="compare-section">
+    <div class="section-header">
+      <h2>規格對比總表</h2>
+      <p>四款列車的核心數據一目了然</p>
+    </div>
+    <div class="compare-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th><span class="col-name"><span class="col-dot col-white"></span>N700系 のぞみ</span></th>
+            <th><span class="col-name"><span class="col-dot col-red"></span>E6系 こまち</span></th>
+            <th><span class="col-name"><span class="col-dot col-yellow"></span>923形 Doctor Yellow</span></th>
+            <th><span class="col-name"><span class="col-dot col-blue"></span>E5系 はやぶさ</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="spec-label">類別</td>
+            <td>營運列車</td>
+            <td>營運列車</td>
+            <td>檢測列車</td>
+            <td>營運列車</td>
+          </tr>
+          <tr>
+            <td class="spec-label">代表色</td>
+            <td>白色 + 藍色條紋</td>
+            <td>茜紅色 + 銀帶</td>
+            <td>黃色 + 藍色條紋</td>
+            <td>常盤綠 + 粉紅帶</td>
+          </tr>
+          <tr>
+            <td class="spec-label">最高速度</td>
+            <td class="speed-cell speed-300">285~300 km/h</td>
+            <td class="speed-cell speed-320">320 km/h</td>
+            <td class="speed-cell speed-other">—</td>
+            <td class="speed-cell speed-320">320 km/h</td>
+          </tr>
+          <tr>
+            <td class="spec-label">編成</td>
+            <td>16両</td>
+            <td>7両</td>
+            <td>7両</td>
+            <td>10両</td>
+          </tr>
+          <tr>
+            <td class="spec-label">定員</td>
+            <td>1,323人</td>
+            <td>約400人</td>
+            <td>—</td>
+            <td>731人</td>
+          </tr>
+          <tr>
+            <td class="spec-label">先頭形狀</td>
+            <td>ダブルウイング・エアロ</td>
+            <td>ロングノーズ</td>
+            <td>流線型</td>
+            <td>ロングノーズ（15m）</td>
+          </tr>
+          <tr>
+            <td class="spec-label">特殊裝置</td>
+            <td>車體傾斜裝置</td>
+            <td>車體傾斜·主動懸吊</td>
+            <td>軌道·電氣檢測設備</td>
+            <td>車體傾斜·主動懸吊</td>
+          </tr>
+          <tr>
+            <td class="spec-label">營業開始</td>
+            <td>2007年</td>
+            <td>2013年</td>
+            <td>2002年</td>
+            <td>2011年</td>
+          </tr>
+          <tr>
+            <td class="spec-label">所屬</td>
+            <td>JR東海 / JR西日本</td>
+            <td>JR東日本</td>
+            <td>JR東海 / JR西日本</td>
+            <td>JR東日本 / JR北海道</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <p>新幹線四色列車對比 · 私人用途 · 圖片來源：photoAC（免費素材）</p>
+    <p style="margin-top:8px;opacity:0.6;">N700系 · E6系 · 923形 Doctor Yellow · E5系</p>
+  </footer>
+</div>
+
+<script>
+  // Generate background particles
+  const particlesContainer = document.getElementById('particles');
+  for (let i = 0; i < 40; i++) {
+    const span = document.createElement('span');
+    span.style.left = Math.random() * 100 + '%';
+    span.style.animationDuration = (15 + Math.random() * 20) + 's';
+    span.style.animationDelay = (Math.random() * 20) + 's';
+    span.style.opacity = Math.random() * 0.5 + 0.2;
+    particlesContainer.appendChild(span);
+  }
+
+  // Intersection Observer for card reveal
+  const observerOptions = { threshold: 0.15, rootMargin: '0px 0px -50px 0px' };
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const delay = parseInt(entry.target.dataset.delay) || 0;
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, delay);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.train-card').forEach(card => {
+    observer.observe(card);
+  });
+
+  // Speed number counter animation
+  const speedNumbers = document.querySelectorAll('.speed-number');
+  const speedObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const target = entry.target;
+        const finalValue = parseInt(target.textContent);
+        let current = 0;
+        const duration = 1500;
+        const increment = finalValue / (duration / 16);
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= finalValue) {
+            current = finalValue;
+            clearInterval(timer);
+          }
+          target.textContent = Math.floor(current);
+        }, 16);
+        speedObserver.unobserve(target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  speedNumbers.forEach(el => speedObserver.observe(el));
+</script>
+</body>
+</html>
